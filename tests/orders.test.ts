@@ -8,7 +8,7 @@ import { migrate } from '../src/migrate.js';
 const app = buildApp();
 const auth: Record<string, string> = { Authorization: 'Bearer C-1001' };
 
-const post = (body: unknown, key: string | undefined = randomUUID(), headers = auth) => {
+const post = (body: unknown, key: string | null = randomUUID(), headers = auth) => {
   const r = request(app).post('/api/v1/orders').set(headers);
   if (key) r.set('Idempotency-Key', key);
   return r.send(body as object);
@@ -63,7 +63,7 @@ describe('validación de entrada', () => {
 
   it('exige Idempotency-Key en formato UUID', async () => {
     const body = { customerId: 'C-1001', items: [{ sku: 'SKU-001', quantity: 1 }] };
-    expect((await post(body, undefined)).status).toBe(400);
+    expect((await post(body, null)).status).toBe(400);
     expect((await post(body, 'no-es-uuid')).status).toBe(400);
   });
 
