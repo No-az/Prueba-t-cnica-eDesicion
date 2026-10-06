@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { pool } from './db.js';
 
 /** Aplica db/migrations/*.sql en orden, una sola vez cada una. */
@@ -27,7 +28,7 @@ export async function migrate(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file:///${process.argv[1]?.replace(/\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   migrate()
     .then(() => pool.end())
     .catch((e) => {
